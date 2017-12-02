@@ -310,3 +310,4 @@ Squad.Admin.RCON/Old/PacketTypes.cs
 Squad.Admin.RCON/Old/Packet.cs
 Squad.Admin.RCON/Squad.Admin.RCON.csproj
 Squad.Admin.RCON/ServerSocket.cs
+SetupProject/generated/*.wxs

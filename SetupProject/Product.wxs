@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" Name="SquadRCON" Language="1033" Version="!(bind.FileVersion.fil0997B15F8A2018706DC4B407F60F4559)" Manufacturer="IMC" UpgradeCode="16efc020-54cc-4451-b97d-fc5773c21b00">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowSameVersionUpgrades="yes" />
+		<MediaTemplate EmbedCab="yes"/>
+
+		<Feature Id="ProductFeature" Title="SetupProject" Level="1">
+			<ComponentGroupRef Id="MainContentGroup" />
+      <ComponentGroupRef Id="QueryMasterContentGroup"/>
+		  <ComponentRef Id="ApplicationShortcut" />
+    </Feature>
+
+	  <Property Id="MSIFASTINSTALL" Value="1" />
+
+	  <UIRef Id="WixUI_InstallDir" />
+	  <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+
+	  <UI>
+	    <UIRef Id="WixUI_InstallDir" />
+      <!-- Skip the license dialog -->
+	    <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg" Order="2">1</Publish>
+	    <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2">1</Publish>
+	  </UI>
+	</Product>
+  
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="SquadRCON">
+          <Directory Id="SquadInstallDir" Name="bin"/>
+        </Directory>
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="Squad RCON Client"/>
+      </Directory>
+    </Directory>
+	</Fragment>
+
+  <Fragment>
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="ApplicationShortcut" Guid="A06D8A15-A7E3-42E1-8076-8480EBE7E5C2">
+        <Shortcut Id="ApplicationStartMenuShortcut"
+                  Name="Squad RCON Client"
+                  Description="Remote RCON client for Squad servers"
+                  Target="[#fil0997B15F8A2018706DC4B407F60F4559]"
+                  WorkingDirectory="SquadInstallDir"/>
+        <RemoveFolder Id="CleanUpShortCut" Directory="ApplicationProgramsFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\Microsoft\MyApplicationName" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+  
+</Wix>
