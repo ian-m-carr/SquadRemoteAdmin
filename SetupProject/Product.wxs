@@ -9,7 +9,8 @@
 		<Feature Id="ProductFeature" Title="SetupProject" Level="1">
 			<ComponentGroupRef Id="MainContentGroup" />
       <ComponentGroupRef Id="QueryMasterContentGroup"/>
-		  <ComponentRef Id="ApplicationShortcut" />
+		  <ComponentGroupRef Id="DependantsContentGroup"/>
+      <ComponentRef Id="ApplicationShortcut" />
     </Feature>
 
 	  <Property Id="MSIFASTINSTALL" Value="1" />
@@ -50,6 +51,25 @@
         <RegistryValue Root="HKCU" Key="Software\Microsoft\MyApplicationName" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
       </Component>
     </DirectoryRef>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="QueryMasterContentGroup">
+      <Component Id="cmp9BEAF64BFCD4F0C06EED234C323C11FC" Directory="SquadInstallDir" Guid="*">
+        <File Id="filB993CD47AE20D8FDD3E309B5DC9E7B1D" Source="$(var.QueryMaster.TargetDir)\QueryMaster.dll" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  
+  <Fragment>
+    <ComponentGroup Id="DependantsContentGroup">
+      <Component Id="filECB2DC125C2C4A09B19ADF2DD5A501AE" Directory="SquadInstallDir" Guid="*">
+        <File Id="NewtonSoft.JSON.DLL" Source="$(var.QueryMaster.TargetDir)\Newtonsoft.Json.dll" />
+      </Component>
+      <Component Id="fil4FC82E987A9A43D7ABE5E38525A2D869" Directory="SquadInstallDir" Guid="*">
+        <File Id="ICSharp.SharpZipLib.DLL" Source="$(var.QueryMaster.TargetDir)\ICSharpCode.SharpZipLib.dll" />
+      </Component>
+    </ComponentGroup>
   </Fragment>
   
 </Wix>

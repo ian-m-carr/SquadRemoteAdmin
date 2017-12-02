@@ -6,7 +6,7 @@
     <ProductVersion>3.10</ProductVersion>
     <ProjectGuid>66511e0e-3e13-4bab-934a-c3d934e2fda2</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>SetupProject</OutputName>
+    <OutputName>SquadRCONSetup</OutputName>
     <OutputType>Package</OutputType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -20,7 +20,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="generated\project.wxs" />
-    <Compile Include="generated\qm_project.wxs" />
     <Compile Include="Product.wxs" />
   </ItemGroup>
   <ItemGroup>
@@ -59,8 +58,7 @@
     <Error Text="The WiX Toolset v3.11 (or newer) build tools must be installed to build this project. To download the WiX Toolset, see http://wixtoolset.org/releases/" />
   </Target>
   <PropertyGroup>
-    <PreBuildEvent>"$(Wix)bin\heat.exe" project "$(SolutionDir)..\Squad.Admin.Console\Squad.Admin.Console.csproj" -directoryid SquadInstallDir -pog Binaries -pog Content -cg MainContentGroup -ag -template fragment -out "$(ProjectDir)generated\project.wxs"
-"$(Wix)bin\heat.exe" project "$(SolutionDir)..\QueryMaster\QueryMaster.csproj" -directoryid SquadInstallDir -pog Binaries -pog Content -cg QueryMasterContentGroup -ag -template fragment -out "$(ProjectDir)generated\qm_project.wxs"</PreBuildEvent>
+    <PreBuildEvent>"$(Wix)bin\heat.exe" project "$(SolutionDir)..\Squad.Admin.Console\Squad.Admin.Console.csproj" -directoryid SquadInstallDir -pog Binaries -pog Content -cg MainContentGroup -ag -template fragment -out "$(ProjectDir)generated\project.wxs"</PreBuildEvent>
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.
