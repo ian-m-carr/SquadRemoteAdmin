@@ -1,4 +1,5 @@
 ﻿#region License
+
 /* 
  * Copyright (C) 2013 Myrcon Pty. Ltd. / Geoff "Phogue" Green
  * 
@@ -20,26 +21,22 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
 */
-#endregion
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Xml;
-using System.Xml.Linq;
-using System.Threading.Tasks;
-using System.IO;
-using System.Windows.Forms;
-using System.Net;
-using System.Diagnostics;
-using Squad.Admin.Console.Utilities;
-using Squad.Admin.Console.RCON;
 
-using QueryMaster;
+#endregion
+
+using System;
+using System.ComponentModel;
+using System.Deployment.Application;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Net;
+using System.Windows.Forms;
+using System.Xml.Linq;
 using QueryMaster.GameServer;
+using Squad.Admin.Console.Properties;
+using Squad.Admin.Console.RCON;
+using Squad.Admin.Console.Utilities;
 
 namespace Squad.Admin.Console.Forms
 {
@@ -72,21 +69,84 @@ namespace Squad.Admin.Console.Forms
 
             rconServerProxy = new ServerProxy();
             LoadAutocompleteCommands();
-            
+            LoadMapNames();
+
+            LoadSettings();
+        }
+
+        private void LoadSettings()
+        {
+            var serverip = Settings.Default.ServerIp;
+            IPAddress ip;
+            if (IPAddress.TryParse(serverip.Trim(), out ip))
+            {
+                serverConnectionInfo.ServerIP = ip;
+                txtServerIP.Text = serverip;
+            }
+
+            var port = Settings.Default.PortNumber;
+            if (port > 0)
+            {
+                txtServerPort.Text = port.ToString();
+                serverConnectionInfo.ServerPort = port;
+            }
+            txtDisplayName.Text = Settings.Default.AdminName;
+
+            btnConnect.Enabled = serverConnectionInfo.IsValid();
+        }
+
+        private void ChangeMapButton_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(MapNamesCombo.Text))
+                MessageBox.Show("Please select or type a map name above", "Missing map name", MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            else RunCommand("AdminChangeMap " + MapNamesCombo.Text);
+        }
+
+        private void SetNextMapButton_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(MapNamesCombo.Text))
+                MessageBox.Show("Please select or type a map name above", "Missing map name", MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            else RunCommand("AdminSetNextMap " + MapNamesCombo.Text);
+        }
+
+        private void EndMatchButton_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Confirm termination of current match", "confirm", MessageBoxButtons.OKCancel,
+                    MessageBoxIcon.Exclamation) == DialogResult.OK) RunCommand("AdminEndMatch");
+        }
+
+        private void RestartMatchButton_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Confirm restart of current match", "confirm", MessageBoxButtons.OKCancel,
+                    MessageBoxIcon.Exclamation) == DialogResult.OK) RunCommand("AdminRestartMatch");
+        }
+
+        private void txtServerIP_TextChanged(object sender, EventArgs e)
+        {
+            Settings.Default.ServerIp = txtServerIP.Text;
+            Settings.Default.Save();
+        }
+
+        private void txtServerPort_TextChanged(object sender, EventArgs e)
+        {
+            Settings.Default.PortNumber = int.Parse(txtServerPort.Text ?? "0");
+            Settings.Default.Save();
         }
 
         #region control validation events
 
         private void TxtRconPassword_Validating(object sender, CancelEventArgs e)
         {
-            TextBox tb = (TextBox)sender;
+            TextBox tb = (TextBox) sender;
             this.serverConnectionInfo.Password = tb.Text.Trim();
             btnConnect.Enabled = this.serverConnectionInfo.IsValid();
         }
 
         private void TxtServerPort_Validating(object sender, CancelEventArgs e)
         {
-            MaskedTextBox tb = (MaskedTextBox)sender;
+            MaskedTextBox tb = (MaskedTextBox) sender;
             this.serverConnectionInfo.ServerPort = Convert.ToInt32(tb.Text.Trim());
             btnConnect.Enabled = this.serverConnectionInfo.IsValid();
         }
@@ -94,7 +154,7 @@ namespace Squad.Admin.Console.Forms
         private void TxtServerIP_Validating(object sender, CancelEventArgs e)
         {
             IPAddress ip;
-            TextBox tb = (TextBox)sender;
+            TextBox tb = (TextBox) sender;
             if (IPAddress.TryParse(tb.Text.Trim(), out ip))
             {
                 this.serverConnectionInfo.ServerIP = ip;
@@ -118,7 +178,7 @@ namespace Squad.Admin.Console.Forms
                     ListPlayers();
                 }
                 LoadContextMenuItems();
-            }
+            } 
             catch (Exception ex)
             {
                 MessageBox.Show("Unexpected error occurred trying to connect! Exception: " + ex.Message + "\r\nPlease report this error to the adminstrator.");
@@ -145,11 +205,7 @@ namespace Squad.Admin.Console.Forms
 
         private void btnSend_Click(object sender, EventArgs e)
         {
-            string response = this.rconServerProxy.SendCommand(txtCommand.Text);
-            AddCommandToHistoryList(txtCommand.Text);
-            AddServerResponseText(txtResponse, response);
-            ClearCommandText(txtCommand, string.Empty);
-            SetControlEnabledState(btnClear, true);
+            RunCommand(txtCommand.Text);
         }
 
 
@@ -178,15 +234,15 @@ namespace Squad.Admin.Console.Forms
             // Only act if the cell content clicked was the player name and an actual row, not a column header
             if (e.ColumnIndex == 1 && e.RowIndex > -1)
             {
-                string sUrl = "http://steamcommunity.com/profiles/" + grdPlayers.Rows[e.RowIndex].Cells[2].Value.ToString();
-                ProcessStartInfo sInfo = new ProcessStartInfo(sUrl);
+                string sUrl = "http://steamcommunity.com/profiles/" + grdPlayers.Rows[e.RowIndex].Cells[2].Value;
+                var sInfo = new ProcessStartInfo(sUrl);
                 Process.Start(sInfo);
             }
         }
 
         /// <summary>
-        /// Menu is dynamically built each time a row is clicked on. The "Tag" property of each menu item is used to store
-        /// the actual RCON command to be executed if a menu item is selected.
+        ///     Menu is dynamically built each time a row is clicked on. The "Tag" property of each menu item is used to store
+        ///     the actual RCON command to be executed if a menu item is selected.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -209,7 +265,7 @@ namespace Squad.Admin.Console.Forms
                     // Warnings
                     MenuItem wi = new MenuItem("Warn");
 
-                    foreach(XElement w in menuReasons.Root.Element("WarnReasons").Elements())
+                    foreach (XElement w in menuReasons.Root.Element("WarnReasons").Elements())
                     {
                         MenuItem warn = new MenuItem(w.Value.Replace("PLAYERNAME", playerName).Replace("ADMINNAME", adminName));
                         warn.Tag = "AdminBroadcast " + warn.Text;
@@ -217,7 +273,7 @@ namespace Squad.Admin.Console.Forms
                         wi.MenuItems.Add(warn);
                     }
                     m.MenuItems.Add(wi);
-                    
+
                     // Kicks
                     MenuItem ki = new MenuItem("Kick");
 
@@ -257,8 +313,8 @@ namespace Squad.Admin.Console.Forms
 
         void menu_Click(object sender, EventArgs e)
         {
-            this.rconServerProxy.SendCommand(((MenuItem)sender).Tag.ToString());
-            AddCommandToHistoryList(((MenuItem)sender).Tag.ToString());
+            this.rconServerProxy.SendCommand(((MenuItem) sender).Tag.ToString());
+            AddCommandToHistoryList(((MenuItem) sender).Tag.ToString());
         }
 
 
@@ -266,14 +322,13 @@ namespace Squad.Admin.Console.Forms
         {
             if (e.Button == MouseButtons.Left)
             {
-                int index = this.lstHistory.IndexFromPoint(e.Location);
-                if (index != System.Windows.Forms.ListBox.NoMatches)
+                int index = lstHistory.IndexFromPoint(e.Location);
+                if (index != ListBox.NoMatches)
                 {
                     SetTextboxText(txtCommand, lstHistory.Items[index].ToString());
                 }
             }
         }
-
 
         #endregion
 
@@ -290,41 +345,107 @@ namespace Squad.Admin.Console.Forms
             SetControlEnabledState(chkShowPassword, !enable);
             SetControlEnabledState(grpPlayerList, enable);
             SetControlEnabledState(grpConsole, enable);
-
+            SetControlEnabledState(grpMapManagement, enable);
         }
 
         /// <summary>
-        /// Fill the Command textbox autocomplete list with all valid commands from the Commands.dat text file
+        ///     Fill the Command textbox autocomplete list with all valid commands from the Commands.dat text file
         /// </summary>
         private void LoadAutocompleteCommands()
         {
             AutoCompleteStringCollection commandList = new AutoCompleteStringCollection();
 
-            string[] commands = File.ReadAllLines(AppDomain.CurrentDomain.BaseDirectory + "Commands.dat");
-
-            for (int i = 0; i < commands.Length; i++)
+            string commandsFile;
+            if (ApplicationDeployment.IsNetworkDeployed)
             {
-                commandList.Add(commands[i].Trim());
+                commandsFile = ApplicationDeployment.CurrentDeployment.DataDirectory + @"\Assets\Commands.dat";
+            } 
+            else
+            {
+                commandsFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Assets\Commands.dat");
             }
 
-            txtCommand.AutoCompleteCustomSource = commandList;
+            if (!File.Exists(commandsFile))
+            {
+                MessageBox.Show(String.Format("Failed to load commands autocomplete file {0}", commandsFile),
+                    "Missing resource", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            } 
+            else
+            {
+                string[] commands = File.ReadAllLines(commandsFile);
+
+                for (int i = 0; i < commands.Length; i++)
+                {
+                    commandList.Add(commands[i].Trim());
+                }
+
+                txtCommand.AutoCompleteCustomSource = commandList;
+            }
         }
 
         /// <summary>
-        /// Load context menu options from the menu xml file into 
+        ///     Fill the Command textbox autocomplete list with all valid commands from the Commands.dat text file
+        /// </summary>
+        private void LoadMapNames()
+        {
+            var mapList = new AutoCompleteStringCollection();
+
+            string commandsFile;
+            if (ApplicationDeployment.IsNetworkDeployed)
+            {
+                commandsFile = ApplicationDeployment.CurrentDeployment.DataDirectory + @"\Assets\Maps.dat";
+            } 
+            else
+            {
+                commandsFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Assets\Maps.dat");
+            }
+
+            if (!File.Exists(commandsFile))
+            {
+                MessageBox.Show(String.Format("Failed to load map list file {0}", commandsFile),
+                    "Missing resource", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            } 
+            else
+            {
+                string[] commands = File.ReadAllLines(commandsFile);
+
+                for (var i = 0; i < commands.Length; i++)
+                {
+                    string map = commands[i].Trim();
+                    if (!string.IsNullOrWhiteSpace(map) && !map.StartsWith(";"))
+                    {
+                        mapList.Add(commands[i].Trim());
+                        MapNamesCombo.Items.Add(map);
+                    }
+                }
+
+                MapNamesCombo.AutoCompleteCustomSource = mapList;
+            }
+        }
+
+        /// <summary>
+        ///     Load context menu options from the menu xml file into
         /// </summary>
         private void LoadContextMenuItems()
         {
+            string commandsFile;
+            if (ApplicationDeployment.IsNetworkDeployed)
+            {
+                commandsFile = ApplicationDeployment.CurrentDeployment.DataDirectory + @"\Assets\MenuReasons.xml";
+            } else
+            {
+                commandsFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Assets\MenuReasons.xml");
+            }
+
             // Load the xml file with the menu reasons
             try
             {
-                menuReasons = XDocument.Load(@"MenuReasons.xml");
-            }
-            catch(Exception ex)
+                menuReasons = XDocument.Load(commandsFile);
+            } 
+            catch (Exception ex)
             {
                 MessageBox.Show("Error occurred trying to open the menu options!\r\nError: " + ex.Message, "Exception", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
             }
-            
         }
 
         #endregion
@@ -332,7 +453,7 @@ namespace Squad.Admin.Console.Forms
         #region Command and response handlers
 
         /// <summary>
-        /// Retrieve server information and display it
+        ///     Retrieve server information and display it
         /// </summary>
         private void GetServerInformation()
         {
@@ -344,17 +465,15 @@ namespace Squad.Admin.Console.Forms
                 lblMapName.Text = info.Map;
                 lblPlayerCount.Text = info.Players + "/" + info.MaxPlayers;
             }
-
         }
 
 
         public void ListPlayers()
         {
-
             string currentLine = string.Empty;
-            bool activePlayers = false;
-            bool disconnectedPlayers = false;
-            bool isPlayer = false;
+            var activePlayers = false;
+            var disconnectedPlayers = false;
+            var isPlayer = false;
 
             try
             {
@@ -364,7 +483,7 @@ namespace Squad.Admin.Console.Forms
                 ClearGridRows(grdPlayers);
 
                 // Take the response and break it into a string array breaking each line off
-                string[] playerArray = playerList.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+                string[] playerArray = playerList.Split(new string[] {"\r\n", "\n"}, StringSplitOptions.None);
 
                 for (int i = 0; i < playerArray.Length; i++)
                 {
@@ -424,12 +543,9 @@ namespace Squad.Admin.Console.Forms
                         }
                     }
                 }
-
-            }
-            catch(Exception ex)
+            } 
+            catch (Exception ex)
             { }
-
-
         }
 
         #endregion
@@ -440,9 +556,9 @@ namespace Squad.Admin.Console.Forms
         {
             if (grdPlayers.InvokeRequired)
             {
-                AddGridRow i = new AddGridRow(AddPlayerToGrid);
-                this.Invoke(i, new object[] { serverSlot, playerName, steamId, connectStatus, disconnectTime });
-            }
+                AddGridRow i = AddPlayerToGrid;
+                Invoke(i, serverSlot, playerName, steamId, connectStatus, disconnectTime);
+            } 
             else
             {
                 grdPlayers.Rows.Add(serverSlot, playerName, steamId, connectStatus, disconnectTime);
@@ -453,9 +569,9 @@ namespace Squad.Admin.Console.Forms
         {
             if (lstHistory.InvokeRequired)
             {
-                AddListboxItem c = new AddListboxItem(AddCommandToHistoryList);
-                this.Invoke(c, new object[] { commandText });
-            }
+                AddListboxItem c = AddCommandToHistoryList;
+                Invoke(c, commandText);
+            } 
             else
             {
                 // prevent duplication of the same command from being added to the list
@@ -473,9 +589,9 @@ namespace Squad.Admin.Console.Forms
         {
             if (txtResponse.InvokeRequired)
             {
-                AddTextToTextbox c = new AddTextToTextbox(AddServerResponseText);
-                this.Invoke(c, new object[] { control, response });
-            }
+                AddTextToTextbox c = AddServerResponseText;
+                Invoke(c, control, response);
+            } 
             else
             {
                 if (control.Text.Length > 0) control.Text += Environment.NewLine + Environment.NewLine;
@@ -487,9 +603,9 @@ namespace Squad.Admin.Console.Forms
         {
             if (control.InvokeRequired)
             {
-                AddTextToTextbox c = new AddTextToTextbox(SetTextboxText);
-                this.Invoke(c, new object[] { control, text });
-            }
+                AddTextToTextbox c = SetTextboxText;
+                Invoke(c, control, text);
+            } 
             else
             {
                 control.Text = text;
@@ -500,9 +616,9 @@ namespace Squad.Admin.Console.Forms
         {
             if (txtResponse.InvokeRequired)
             {
-                AddTextToTextbox c = new AddTextToTextbox(ClearCommandText);
-                this.Invoke(c, new object[] { control, response });
-            }
+                AddTextToTextbox c = ClearCommandText;
+                Invoke(c, control, response);
+            } 
             else
             {
                 control.Text = string.Empty;
@@ -513,10 +629,9 @@ namespace Squad.Admin.Console.Forms
         {
             if (gridControl.InvokeRequired)
             {
-                ClearGrid c = new ClearGrid(ClearGridRows);
-                this.Invoke(c, new object[] { gridControl });
-            }
-            else
+                ClearGrid c = ClearGridRows;
+                Invoke(c, gridControl);
+            } else
             {
                 gridControl.Rows.Clear();
             }
@@ -526,10 +641,9 @@ namespace Squad.Admin.Console.Forms
         {
             if (listboxControl.InvokeRequired)
             {
-                ClearListBox c = new ClearListBox(ClearCommandHistory);
-                this.Invoke(c, new object[] { listboxControl });
-            }
-            else
+                ClearListBox c = ClearCommandHistory;
+                Invoke(c, listboxControl);
+            } else
             {
                 listboxControl.Items.Clear();
             }
@@ -540,16 +654,29 @@ namespace Squad.Admin.Console.Forms
         {
             if (control.InvokeRequired)
             {
-                SetControlEnabled c = new SetControlEnabled(SetControlEnabledState);
-                this.Invoke(c, new object[] { control, isEnabled });
-            }
-            else
+                SetControlEnabled c = SetControlEnabledState;
+                Invoke(c, control, isEnabled);
+            } else
             {
                 control.Enabled = isEnabled;
             }
         }
+
+        private void RunCommand(string command)
+        {
+            string response = rconServerProxy.SendCommand(command);
+            AddCommandToHistoryList(command);
+            AddServerResponseText(txtResponse, response);
+            ClearCommandText(txtCommand, string.Empty);
+            SetControlEnabledState(btnClear, true);
+        }
+
         #endregion
 
-
+        private void txtDisplayName_TextChanged(object sender, EventArgs e)
+        {
+            Settings.Default.AdminName = txtDisplayName.Text;
+            Settings.Default.Save();
+        }
     }
 }
