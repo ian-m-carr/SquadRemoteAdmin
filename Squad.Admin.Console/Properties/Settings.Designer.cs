@@ -22,5 +22,41 @@ namespace Squad.Admin.Console.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ServerIp {
+            get {
+                return ((string)(this["ServerIp"]));
+            }
+            set {
+                this["ServerIp"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int PortNumber {
+            get {
+                return ((int)(this["PortNumber"]));
+            }
+            set {
+                this["PortNumber"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AdminName {
+            get {
+                return ((string)(this["AdminName"]));
+            }
+            set {
+                this["AdminName"] = value;
+            }
+        }
     }
 }

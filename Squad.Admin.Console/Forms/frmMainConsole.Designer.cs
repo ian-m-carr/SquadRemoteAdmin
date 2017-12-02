@@ -67,11 +67,18 @@
             this.lblMapName = new System.Windows.Forms.Label();
             this.lblPlayerCountLabel = new System.Windows.Forms.Label();
             this.lblPlayerCount = new System.Windows.Forms.Label();
+            this.grpMapManagement = new System.Windows.Forms.GroupBox();
+            this.RestartMatchButton = new System.Windows.Forms.Button();
+            this.EndMatchButton = new System.Windows.Forms.Button();
+            this.SetNextMapButton = new System.Windows.Forms.Button();
+            this.ChangeMapButton = new System.Windows.Forms.Button();
+            this.MapNamesCombo = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.grpPlayerList.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.grdPlayers)).BeginInit();
             this.grpConsole.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.grpMapManagement.SuspendLayout();
             this.SuspendLayout();
             // 
             // pictureBox1
@@ -95,7 +102,7 @@
             this.grpPlayerList.Enabled = false;
             this.grpPlayerList.Location = new System.Drawing.Point(12, 114);
             this.grpPlayerList.Name = "grpPlayerList";
-            this.grpPlayerList.Size = new System.Drawing.Size(639, 673);
+            this.grpPlayerList.Size = new System.Drawing.Size(639, 727);
             this.grpPlayerList.TabIndex = 0;
             this.grpPlayerList.TabStop = false;
             this.grpPlayerList.Text = "Player List";
@@ -116,7 +123,7 @@
             this.grdPlayers.Location = new System.Drawing.Point(9, 46);
             this.grdPlayers.Name = "grdPlayers";
             this.grdPlayers.ReadOnly = true;
-            this.grdPlayers.Size = new System.Drawing.Size(624, 579);
+            this.grdPlayers.Size = new System.Drawing.Size(624, 633);
             this.grdPlayers.TabIndex = 11;
             // 
             // cSlot
@@ -174,7 +181,7 @@
             // btnRefresh
             // 
             this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnRefresh.Location = new System.Drawing.Point(482, 631);
+            this.btnRefresh.Location = new System.Drawing.Point(482, 685);
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(151, 36);
             this.btnRefresh.TabIndex = 6;
@@ -196,9 +203,9 @@
             this.grpConsole.Controls.Add(this.txtResponse);
             this.grpConsole.Controls.Add(this.txtCommand);
             this.grpConsole.Enabled = false;
-            this.grpConsole.Location = new System.Drawing.Point(657, 114);
+            this.grpConsole.Location = new System.Drawing.Point(657, 195);
             this.grpConsole.Name = "grpConsole";
-            this.grpConsole.Size = new System.Drawing.Size(481, 673);
+            this.grpConsole.Size = new System.Drawing.Size(481, 646);
             this.grpConsole.TabIndex = 0;
             this.grpConsole.TabStop = false;
             this.grpConsole.Text = "Console Command";
@@ -206,7 +213,7 @@
             // btnClearConsole
             // 
             this.btnClearConsole.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClearConsole.Location = new System.Drawing.Point(366, 631);
+            this.btnClearConsole.Location = new System.Drawing.Point(366, 604);
             this.btnClearConsole.Name = "btnClearConsole";
             this.btnClearConsole.Size = new System.Drawing.Size(109, 36);
             this.btnClearConsole.TabIndex = 8;
@@ -276,7 +283,7 @@
             this.txtResponse.Name = "txtResponse";
             this.txtResponse.ReadOnly = true;
             this.txtResponse.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtResponse.Size = new System.Drawing.Size(469, 301);
+            this.txtResponse.Size = new System.Drawing.Size(469, 274);
             this.txtResponse.TabIndex = 7;
             // 
             // txtCommand
@@ -327,6 +334,7 @@
             this.txtServerIP.Name = "txtServerIP";
             this.txtServerIP.Size = new System.Drawing.Size(102, 20);
             this.txtServerIP.TabIndex = 2;
+            this.txtServerIP.TextChanged += new System.EventHandler(this.txtServerIP_TextChanged);
             // 
             // txtServerPort
             // 
@@ -335,6 +343,7 @@
             this.txtServerPort.Name = "txtServerPort";
             this.txtServerPort.Size = new System.Drawing.Size(49, 20);
             this.txtServerPort.TabIndex = 4;
+            this.txtServerPort.TextChanged += new System.EventHandler(this.txtServerPort_TextChanged);
             // 
             // chkShowPassword
             // 
@@ -375,6 +384,7 @@
             this.txtDisplayName.Name = "txtDisplayName";
             this.txtDisplayName.Size = new System.Drawing.Size(162, 20);
             this.txtDisplayName.TabIndex = 8;
+            this.txtDisplayName.TextChanged += new System.EventHandler(this.txtDisplayName_TextChanged);
             // 
             // lblDisplayName
             // 
@@ -463,11 +473,78 @@
             this.lblPlayerCount.Size = new System.Drawing.Size(0, 13);
             this.lblPlayerCount.TabIndex = 16;
             // 
+            // grpMapManagement
+            // 
+            this.grpMapManagement.Controls.Add(this.RestartMatchButton);
+            this.grpMapManagement.Controls.Add(this.EndMatchButton);
+            this.grpMapManagement.Controls.Add(this.SetNextMapButton);
+            this.grpMapManagement.Controls.Add(this.ChangeMapButton);
+            this.grpMapManagement.Controls.Add(this.MapNamesCombo);
+            this.grpMapManagement.Enabled = false;
+            this.grpMapManagement.Location = new System.Drawing.Point(657, 114);
+            this.grpMapManagement.Name = "grpMapManagement";
+            this.grpMapManagement.Size = new System.Drawing.Size(481, 75);
+            this.grpMapManagement.TabIndex = 18;
+            this.grpMapManagement.TabStop = false;
+            this.grpMapManagement.Text = "Map Management";
+            // 
+            // RestartMatchButton
+            // 
+            this.RestartMatchButton.Location = new System.Drawing.Point(88, 45);
+            this.RestartMatchButton.Name = "RestartMatchButton";
+            this.RestartMatchButton.Size = new System.Drawing.Size(89, 23);
+            this.RestartMatchButton.TabIndex = 4;
+            this.RestartMatchButton.Text = "Restart Current";
+            this.RestartMatchButton.UseVisualStyleBackColor = true;
+            this.RestartMatchButton.Click += new System.EventHandler(this.RestartMatchButton_Click);
+            // 
+            // EndMatchButton
+            // 
+            this.EndMatchButton.Location = new System.Drawing.Point(7, 45);
+            this.EndMatchButton.Name = "EndMatchButton";
+            this.EndMatchButton.Size = new System.Drawing.Size(75, 23);
+            this.EndMatchButton.TabIndex = 3;
+            this.EndMatchButton.Text = "End Current Match";
+            this.EndMatchButton.UseVisualStyleBackColor = true;
+            this.EndMatchButton.Click += new System.EventHandler(this.EndMatchButton_Click);
+            // 
+            // SetNextMapButton
+            // 
+            this.SetNextMapButton.Location = new System.Drawing.Point(329, 45);
+            this.SetNextMapButton.Name = "SetNextMapButton";
+            this.SetNextMapButton.Size = new System.Drawing.Size(137, 23);
+            this.SetNextMapButton.TabIndex = 2;
+            this.SetNextMapButton.Text = "SetNextMap (delayed)";
+            this.SetNextMapButton.UseVisualStyleBackColor = true;
+            this.SetNextMapButton.Click += new System.EventHandler(this.SetNextMapButton_Click);
+            // 
+            // ChangeMapButton
+            // 
+            this.ChangeMapButton.Location = new System.Drawing.Point(183, 45);
+            this.ChangeMapButton.Name = "ChangeMapButton";
+            this.ChangeMapButton.Size = new System.Drawing.Size(140, 23);
+            this.ChangeMapButton.TabIndex = 1;
+            this.ChangeMapButton.Text = "ChangeMap (immediate)";
+            this.ChangeMapButton.UseVisualStyleBackColor = true;
+            this.ChangeMapButton.Click += new System.EventHandler(this.ChangeMapButton_Click);
+            // 
+            // MapNamesCombo
+            // 
+            this.MapNamesCombo.AllowDrop = true;
+            this.MapNamesCombo.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.MapNamesCombo.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.MapNamesCombo.FormattingEnabled = true;
+            this.MapNamesCombo.Location = new System.Drawing.Point(7, 18);
+            this.MapNamesCombo.Name = "MapNamesCombo";
+            this.MapNamesCombo.Size = new System.Drawing.Size(459, 21);
+            this.MapNamesCombo.TabIndex = 0;
+            // 
             // frmMainConsole
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1150, 799);
+            this.ClientSize = new System.Drawing.Size(1150, 853);
+            this.Controls.Add(this.grpMapManagement);
             this.Controls.Add(this.lblPlayerCount);
             this.Controls.Add(this.lblPlayerCountLabel);
             this.Controls.Add(this.lblMapName);
@@ -489,6 +566,7 @@
             this.grpConsole.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.grpMapManagement.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -534,5 +612,11 @@
         private System.Windows.Forms.Label lblMapName;
         private System.Windows.Forms.Label lblPlayerCountLabel;
         private System.Windows.Forms.Label lblPlayerCount;
+        private System.Windows.Forms.GroupBox grpMapManagement;
+        private System.Windows.Forms.Button SetNextMapButton;
+        private System.Windows.Forms.Button ChangeMapButton;
+        private System.Windows.Forms.ComboBox MapNamesCombo;
+        private System.Windows.Forms.Button EndMatchButton;
+        private System.Windows.Forms.Button RestartMatchButton;
     }
 }
