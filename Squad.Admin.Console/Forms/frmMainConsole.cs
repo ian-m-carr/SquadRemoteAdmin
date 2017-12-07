@@ -328,8 +328,9 @@ namespace Squad.Admin.Console.Forms
             if (MessageBox.Show(String.Format("Confirm the player action {0}", ((MenuItem) sender).Tag.ToString()),
                 "Confirm the player action", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
             {
-                this.rconServerProxy.SendCommand(((MenuItem) sender).Tag.ToString());
+                var response = this.rconServerProxy.SendCommand(((MenuItem) sender).Tag.ToString());
                 AddCommandToHistoryList(((MenuItem) sender).Tag.ToString());
+                AddServerResponseText(txtResponse, response);
             }
         }
 
