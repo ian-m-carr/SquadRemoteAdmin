@@ -147,8 +147,15 @@ namespace Squad.Admin.Console.Forms
         private void TxtServerPort_Validating(object sender, CancelEventArgs e)
         {
             MaskedTextBox tb = (MaskedTextBox) sender;
-            this.serverConnectionInfo.ServerPort = Convert.ToInt32(tb.Text.Trim());
-            btnConnect.Enabled = this.serverConnectionInfo.IsValid();
+            try
+            {
+                this.serverConnectionInfo.ServerPort = Convert.ToInt32(tb.Text.Trim());
+                btnConnect.Enabled = this.serverConnectionInfo.IsValid();
+            } 
+            catch (Exception)
+            {
+                // do nothing, port is not a valid one
+            }
         }
 
         private void TxtServerIP_Validating(object sender, CancelEventArgs e)
@@ -262,6 +269,11 @@ namespace Squad.Admin.Console.Forms
                 {
                     ContextMenu m = new ContextMenu();
 
+                    MenuItem ct = new MenuItem("ChangeTeam");
+                    ct.Tag = "AdminForceTeamChange " + playerSteamId;
+                    ct.Click += menu_Click;
+                    m.MenuItems.Add(ct);
+
                     // Warnings
                     MenuItem wi = new MenuItem("Warn");
 
@@ -313,8 +325,13 @@ namespace Squad.Admin.Console.Forms
 
         void menu_Click(object sender, EventArgs e)
         {
-            this.rconServerProxy.SendCommand(((MenuItem) sender).Tag.ToString());
-            AddCommandToHistoryList(((MenuItem) sender).Tag.ToString());
+            if (MessageBox.Show(String.Format("Confirm the player action {0}", ((MenuItem) sender).Tag.ToString()),
+                "Confirm the player action", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
+            {
+                var response = this.rconServerProxy.SendCommand(((MenuItem) sender).Tag.ToString());
+                AddCommandToHistoryList(((MenuItem) sender).Tag.ToString());
+                AddServerResponseText(txtResponse, response);
+            }
         }
 
 
@@ -595,6 +612,11 @@ namespace Squad.Admin.Console.Forms
             } 
             else
             {
+                // substitute \r\n for \n
+                if (!string.IsNullOrWhiteSpace(response))
+                {
+                    response = response.Replace("\n", Environment.NewLine);
+                }
                 if (control.Text.Length > 0) control.Text += Environment.NewLine + Environment.NewLine;
                 control.Text += response;
             }
@@ -678,6 +700,12 @@ namespace Squad.Admin.Console.Forms
         {
             Settings.Default.AdminName = txtDisplayName.Text;
             Settings.Default.Save();
+        }
+
+        private void txtRconPassword_TextChanged(object sender, EventArgs e) {
+            TextBox tb = (TextBox)sender;
+            this.serverConnectionInfo.Password = tb.Text.Trim();
+            btnConnect.Enabled = this.serverConnectionInfo.IsValid();
         }
     }
 }
