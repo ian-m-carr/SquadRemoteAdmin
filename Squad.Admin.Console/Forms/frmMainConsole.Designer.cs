@@ -237,7 +237,7 @@
             this.lstHistory.FormattingEnabled = true;
             this.lstHistory.Location = new System.Drawing.Point(6, 108);
             this.lstHistory.Name = "lstHistory";
-            this.lstHistory.Size = new System.Drawing.Size(469, 147);
+            this.lstHistory.Size = new System.Drawing.Size(469, 56);
             this.lstHistory.TabIndex = 5;
             // 
             // label1
@@ -252,7 +252,7 @@
             // btnClear
             // 
             this.btnClear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClear.Location = new System.Drawing.Point(366, 261);
+            this.btnClear.Location = new System.Drawing.Point(366, 170);
             this.btnClear.Name = "btnClear";
             this.btnClear.Size = new System.Drawing.Size(109, 36);
             this.btnClear.TabIndex = 3;
@@ -278,12 +278,12 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtResponse.BackColor = System.Drawing.Color.Black;
             this.txtResponse.ForeColor = System.Drawing.Color.Lime;
-            this.txtResponse.Location = new System.Drawing.Point(6, 324);
+            this.txtResponse.Location = new System.Drawing.Point(6, 212);
             this.txtResponse.Multiline = true;
             this.txtResponse.Name = "txtResponse";
             this.txtResponse.ReadOnly = true;
             this.txtResponse.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtResponse.Size = new System.Drawing.Size(469, 274);
+            this.txtResponse.Size = new System.Drawing.Size(469, 386);
             this.txtResponse.TabIndex = 7;
             // 
             // txtCommand
@@ -475,6 +475,8 @@
             // 
             // grpMapManagement
             // 
+            this.grpMapManagement.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.grpMapManagement.Controls.Add(this.RestartMatchButton);
             this.grpMapManagement.Controls.Add(this.EndMatchButton);
             this.grpMapManagement.Controls.Add(this.SetNextMapButton);
@@ -531,6 +533,8 @@
             // MapNamesCombo
             // 
             this.MapNamesCombo.AllowDrop = true;
+            this.MapNamesCombo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.MapNamesCombo.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.MapNamesCombo.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this.MapNamesCombo.FormattingEnabled = true;
@@ -541,8 +545,8 @@
             // 
             // frmMainConsole
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(1150, 853);
             this.Controls.Add(this.grpMapManagement);
             this.Controls.Add(this.lblPlayerCount);

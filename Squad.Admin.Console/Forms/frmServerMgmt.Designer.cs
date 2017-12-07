@@ -29,8 +29,9 @@
         private void InitializeComponent()
         {
             this.grpServerInfo = new System.Windows.Forms.GroupBox();
-            this.listView1 = new System.Windows.Forms.ListView();
-            this.lblServers = new System.Windows.Forms.Label();
+            this.txtServerIP = new System.Windows.Forms.MaskedTextBox();
+            this.txtServerName = new System.Windows.Forms.TextBox();
+            this.lblServer = new System.Windows.Forms.Label();
             this.txtDisplayName = new System.Windows.Forms.TextBox();
             this.lblDisplayName = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
@@ -38,9 +39,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.txtServerPort = new System.Windows.Forms.TextBox();
-            this.txtServerName = new System.Windows.Forms.TextBox();
-            this.lblServer = new System.Windows.Forms.Label();
-            this.txtServerIP = new System.Windows.Forms.MaskedTextBox();
+            this.listView1 = new System.Windows.Forms.ListView();
+            this.lblServers = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
@@ -66,23 +66,29 @@
             this.grpServerInfo.TabStop = false;
             this.grpServerInfo.Text = "Server Connection Information";
             // 
-            // listView1
+            // txtServerIP
             // 
-            this.listView1.Location = new System.Drawing.Point(13, 172);
-            this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(429, 147);
-            this.listView1.TabIndex = 12;
-            this.listView1.UseCompatibleStateImageBehavior = false;
-            this.listView1.View = System.Windows.Forms.View.Details;
+            this.txtServerIP.Location = new System.Drawing.Point(121, 49);
+            this.txtServerIP.Mask = "###.###.###.###";
+            this.txtServerIP.Name = "txtServerIP";
+            this.txtServerIP.Size = new System.Drawing.Size(102, 20);
+            this.txtServerIP.TabIndex = 4;
             // 
-            // lblServers
+            // txtServerName
             // 
-            this.lblServers.AutoSize = true;
-            this.lblServers.Location = new System.Drawing.Point(12, 156);
-            this.lblServers.Name = "lblServers";
-            this.lblServers.Size = new System.Drawing.Size(43, 13);
-            this.lblServers.TabIndex = 11;
-            this.lblServers.Text = "Servers";
+            this.txtServerName.Location = new System.Drawing.Point(121, 23);
+            this.txtServerName.Name = "txtServerName";
+            this.txtServerName.Size = new System.Drawing.Size(162, 20);
+            this.txtServerName.TabIndex = 2;
+            // 
+            // lblServer
+            // 
+            this.lblServer.AutoSize = true;
+            this.lblServer.Location = new System.Drawing.Point(10, 26);
+            this.lblServer.Name = "lblServer";
+            this.lblServer.Size = new System.Drawing.Size(70, 13);
+            this.lblServer.TabIndex = 1;
+            this.lblServer.Text = "Server Label:";
             // 
             // txtDisplayName
             // 
@@ -141,29 +147,23 @@
             this.txtServerPort.Size = new System.Drawing.Size(52, 20);
             this.txtServerPort.TabIndex = 6;
             // 
-            // txtServerName
+            // listView1
             // 
-            this.txtServerName.Location = new System.Drawing.Point(121, 23);
-            this.txtServerName.Name = "txtServerName";
-            this.txtServerName.Size = new System.Drawing.Size(162, 20);
-            this.txtServerName.TabIndex = 2;
+            this.listView1.Location = new System.Drawing.Point(13, 172);
+            this.listView1.Name = "listView1";
+            this.listView1.Size = new System.Drawing.Size(429, 147);
+            this.listView1.TabIndex = 12;
+            this.listView1.UseCompatibleStateImageBehavior = false;
+            this.listView1.View = System.Windows.Forms.View.Details;
             // 
-            // lblServer
+            // lblServers
             // 
-            this.lblServer.AutoSize = true;
-            this.lblServer.Location = new System.Drawing.Point(10, 26);
-            this.lblServer.Name = "lblServer";
-            this.lblServer.Size = new System.Drawing.Size(70, 13);
-            this.lblServer.TabIndex = 1;
-            this.lblServer.Text = "Server Label:";
-            // 
-            // txtServerIP
-            // 
-            this.txtServerIP.Location = new System.Drawing.Point(121, 49);
-            this.txtServerIP.Mask = "###.###.###.###";
-            this.txtServerIP.Name = "txtServerIP";
-            this.txtServerIP.Size = new System.Drawing.Size(102, 20);
-            this.txtServerIP.TabIndex = 4;
+            this.lblServers.AutoSize = true;
+            this.lblServers.Location = new System.Drawing.Point(12, 156);
+            this.lblServers.Name = "lblServers";
+            this.lblServers.Size = new System.Drawing.Size(43, 13);
+            this.lblServers.TabIndex = 11;
+            this.lblServers.Text = "Servers";
             // 
             // button1
             // 
@@ -194,8 +194,8 @@
             // 
             // frmServerMgmt
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(594, 331);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
