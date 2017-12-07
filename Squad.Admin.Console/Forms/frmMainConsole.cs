@@ -612,6 +612,11 @@ namespace Squad.Admin.Console.Forms
             } 
             else
             {
+                // substitute \r\n for \n
+                if (!string.IsNullOrWhiteSpace(response))
+                {
+                    response = response.Replace("\n", Environment.NewLine);
+                }
                 if (control.Text.Length > 0) control.Text += Environment.NewLine + Environment.NewLine;
                 control.Text += response;
             }
@@ -695,6 +700,12 @@ namespace Squad.Admin.Console.Forms
         {
             Settings.Default.AdminName = txtDisplayName.Text;
             Settings.Default.Save();
+        }
+
+        private void txtRconPassword_TextChanged(object sender, EventArgs e) {
+            TextBox tb = (TextBox)sender;
+            this.serverConnectionInfo.Password = tb.Text.Trim();
+            btnConnect.Enabled = this.serverConnectionInfo.IsValid();
         }
     }
 }

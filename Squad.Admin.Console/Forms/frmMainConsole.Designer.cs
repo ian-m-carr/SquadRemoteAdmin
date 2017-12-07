@@ -243,7 +243,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 308);
+            this.label1.Location = new System.Drawing.Point(6, 205);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(117, 13);
             this.label1.TabIndex = 6;
@@ -278,12 +278,12 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtResponse.BackColor = System.Drawing.Color.Black;
             this.txtResponse.ForeColor = System.Drawing.Color.Lime;
-            this.txtResponse.Location = new System.Drawing.Point(6, 212);
+            this.txtResponse.Location = new System.Drawing.Point(6, 221);
             this.txtResponse.Multiline = true;
             this.txtResponse.Name = "txtResponse";
             this.txtResponse.ReadOnly = true;
             this.txtResponse.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtResponse.Size = new System.Drawing.Size(469, 386);
+            this.txtResponse.Size = new System.Drawing.Size(469, 377);
             this.txtResponse.TabIndex = 7;
             // 
             // txtCommand
@@ -411,6 +411,7 @@
             this.txtRconPassword.Size = new System.Drawing.Size(102, 20);
             this.txtRconPassword.TabIndex = 6;
             this.txtRconPassword.UseSystemPasswordChar = true;
+            this.txtRconPassword.TextChanged += new System.EventHandler(this.txtRconPassword_TextChanged);
             // 
             // label4
             // 
