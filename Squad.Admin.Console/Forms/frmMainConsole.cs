@@ -1,4 +1,5 @@
 ﻿#region License
+
 /* 
  * Copyright (C) 2013 Myrcon Pty. Ltd. / Geoff "Phogue" Green
  *
@@ -39,44 +40,51 @@ using Squad.Admin.Console.Utilities;
 
 namespace Squad.Admin.Console.Forms
 {
-    delegate void ClearGrid(DataGridView gridControl);
-    delegate void ClearListBox(ListBox listboxControl);
-    delegate void SetControlEnabled(Control control, bool isEnabled);
-    delegate void AddGridRow(string slot, string name, string steamId, string status, string disconnectTime);
-    delegate void AddListboxItem(string command);
-    delegate void AddTextToTextbox(TextBox textbox, string response);
+    internal delegate void ClearGrid(DataGridView gridControl);
+
+    internal delegate void ClearListBox(ListBox listboxControl);
+
+    internal delegate void SetControlEnabled(Control control, bool isEnabled);
+
+    internal delegate void AddGridRow(string slot, string name, string steamId, string status, string disconnectTime);
+
+    internal delegate void AddListboxItem(string command);
+
+    internal delegate void AddTextToTextbox(TextBox textbox, string response);
 
     public partial class frmMainConsole : Form
     {
+        private readonly ServerProxy rconServerProxy;
 
-        ServerConnectionInfo serverConnectionInfo = new ServerConnectionInfo();
-        ServerProxy rconServerProxy;
-        XDocument menuReasons;
+        private readonly ServerConnectionInfo serverConnectionInfo = new ServerConnectionInfo();
+        private XDocument menuReasons;
 
         public frmMainConsole()
         {
             InitializeComponent();
 
             // Bind control event handlers
-            this.txtServerIP.Validating += TxtServerIP_Validating;
-            this.txtServerPort.Validating += TxtServerPort_Validating;
-            this.txtRconPassword.Validating += TxtRconPassword_Validating;
-            this.grdPlayers.CellContentClick += GrdPlayers_CellContentClick;
-            this.grdPlayers.MouseClick += GrdPlayers_MouseClick;
-            this.grdPlayers.RowPrePaint += GrdPlayers_RowPrePaint;
-            this.lstHistory.MouseDoubleClick += LstHistory_MouseDoubleClick;
+            txtServerIP.Validating += TxtServerIP_Validating;
+            txtServerPort.Validating += TxtServerPort_Validating;
+            MTQueryPort.Validating += TxtQueryPort_Validating;
+            txtRconPassword.Validating += TxtRconPassword_Validating;
+            grdPlayers.CellContentClick += GrdPlayers_CellContentClick;
+            grdPlayers.MouseClick += GrdPlayers_MouseClick;
+            grdPlayers.RowPrePaint += GrdPlayers_RowPrePaint;
+            lstHistory.MouseDoubleClick += LstHistory_MouseDoubleClick;
 
             rconServerProxy = new ServerProxy();
             LoadAutocompleteCommands();
 
-            LoadMapNames();
+            // start with the squad set
+            LoadMapNames("SQMaps.dat");
 
             LoadSettings();
         }
 
         private void LoadSettings()
         {
-            var serverip = Settings.Default.ServerIp;
+            string serverip = Settings.Default.ServerIp;
             IPAddress ip;
             if (IPAddress.TryParse(serverip.Trim(), out ip))
             {
@@ -84,12 +92,27 @@ namespace Squad.Admin.Console.Forms
                 txtServerIP.Text = serverip;
             }
 
-            var port = Settings.Default.PortNumber;
+            int port = Settings.Default.PortNumber;
             if (port > 0)
             {
                 txtServerPort.Text = port.ToString();
                 serverConnectionInfo.ServerPort = port;
+            } else
+            {
+                txtServerPort.Text = "21114";
+                serverConnectionInfo.ServerPort = 21114;
             }
+
+            int queryport = Settings.Default.QueryPort;
+            if (port > 0) {
+                MTQueryPort.Text = queryport.ToString();
+                serverConnectionInfo.QueryPort = queryport;
+            } else
+            {
+                MTQueryPort.Text = "27165";
+                serverConnectionInfo.QueryPort = 27165;
+            }
+
             txtDisplayName.Text = Settings.Default.AdminName;
 
             btnConnect.Enabled = serverConnectionInfo.IsValid();
@@ -131,29 +154,105 @@ namespace Squad.Admin.Console.Forms
 
         private void txtServerPort_TextChanged(object sender, EventArgs e)
         {
-            Settings.Default.PortNumber = int.Parse(txtServerPort.Text ?? "0");
+            try{
+                Settings.Default.PortNumber = int.Parse(txtServerPort.Text ?? "0");
+                Settings.Default.Save();
+            } catch (FormatException)
+            {
+
+            }
+        }
+
+        private void txtDisplayName_TextChanged(object sender, EventArgs e)
+        {
+            Settings.Default.AdminName = txtDisplayName.Text;
             Settings.Default.Save();
+        }
+
+        private void txtRconPassword_TextChanged(object sender, EventArgs e)
+        {
+            var tb = (TextBox) sender;
+            serverConnectionInfo.Password = tb.Text.Trim();
+            btnConnect.Enabled = serverConnectionInfo.IsValid();
+        }
+
+        private void frmMainConsole_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (WindowState == FormWindowState.Maximized)
+            {
+                Settings.Default.Location = RestoreBounds.Location;
+                Settings.Default.Size = RestoreBounds.Size;
+                Settings.Default.Maximised = true;
+                Settings.Default.Minimised = false;
+            } else if (WindowState == FormWindowState.Normal)
+            {
+                Settings.Default.Location = Location;
+                Settings.Default.Size = Size;
+                Settings.Default.Maximised = false;
+                Settings.Default.Minimised = false;
+            } else
+            {
+                Settings.Default.Location = RestoreBounds.Location;
+                Settings.Default.Size = RestoreBounds.Size;
+                Settings.Default.Maximised = false;
+                Settings.Default.Minimised = true;
+            }
+
+            Settings.Default.Save();
+        }
+
+        private void frmMainConsole_Load(object sender, EventArgs e)
+        {
+            Point dloc = Location = Settings.Default.Location;
+            Size dsize = Settings.Default.Size;
+
+            if (Settings.Default.Maximised)
+                WindowState = FormWindowState.Maximized;
+            else if (Settings.Default.Minimised) WindowState = FormWindowState.Minimized;
+            if (dloc != Point.Empty) Location = Settings.Default.Location;
+            if (dsize != Size.Empty) Size = Settings.Default.Size;
+        }
+
+        private void RBPostScriptum_CheckedChanged(object sender, EventArgs e)
+        {
+            var rb = sender as RadioButton;
+            if (rb != null && rb.Checked) LoadMapNames("PSMaps.dat");
+        }
+
+        private void RBSquad_CheckedChanged(object sender, EventArgs e)
+        {
+            var rb = sender as RadioButton;
+            if (rb != null && rb.Checked) LoadMapNames("SQMaps.dat");
         }
 
         #region control validation events
 
         private void TxtRconPassword_Validating(object sender, CancelEventArgs e)
         {
-            TextBox tb = (TextBox) sender;
-            this.serverConnectionInfo.Password = tb.Text.Trim();
-            btnConnect.Enabled = this.serverConnectionInfo.IsValid();
+            var tb = (TextBox) sender;
+            serverConnectionInfo.Password = tb.Text.Trim();
+            btnConnect.Enabled = serverConnectionInfo.IsValid();
         }
 
         private void TxtServerPort_Validating(object sender, CancelEventArgs e)
         {
-            MaskedTextBox tb = (MaskedTextBox) sender;
+            var tb = (MaskedTextBox) sender;
             try
             {
-                this.serverConnectionInfo.ServerPort = Convert.ToInt32(tb.Text.Trim());
-                btnConnect.Enabled = this.serverConnectionInfo.IsValid();
-            } 
-            catch (Exception)
+                serverConnectionInfo.ServerPort = Convert.ToInt32(tb.Text.Trim());
+                btnConnect.Enabled = serverConnectionInfo.IsValid();
+            } catch (Exception)
             {
+                // do nothing, port is not a valid one
+            }
+        }
+
+        private void TxtQueryPort_Validating(object sender, CancelEventArgs e) {
+            var tb = (MaskedTextBox)sender;
+            try {
+                serverConnectionInfo.QueryPort = Convert.ToInt32(tb.Text.Trim());
+                btnConnect.Enabled = serverConnectionInfo.IsValid();
+            } catch (Exception) {
                 // do nothing, port is not a valid one
             }
         }
@@ -161,12 +260,9 @@ namespace Squad.Admin.Console.Forms
         private void TxtServerIP_Validating(object sender, CancelEventArgs e)
         {
             IPAddress ip;
-            TextBox tb = (TextBox) sender;
-            if (IPAddress.TryParse(tb.Text.Trim(), out ip))
-            {
-                this.serverConnectionInfo.ServerIP = ip;
-            }
-            btnConnect.Enabled = this.serverConnectionInfo.IsValid();
+            var tb = (TextBox) sender;
+            if (IPAddress.TryParse(tb.Text.Trim(), out ip)) serverConnectionInfo.ServerIP = ip;
+            btnConnect.Enabled = serverConnectionInfo.IsValid();
         }
 
         #endregion
@@ -178,17 +274,18 @@ namespace Squad.Admin.Console.Forms
             try
             {
                 // Connect to the game server
-                if (this.rconServerProxy.Connect(this.serverConnectionInfo))
+                if (rconServerProxy.Connect(serverConnectionInfo))
                 {
                     EnableLoginControls(true);
                     GetServerInformation();
                     ListPlayers();
                 }
+
                 LoadContextMenuItems();
-            } 
-            catch (Exception ex)
+            } catch (Exception ex)
             {
-                MessageBox.Show("Unexpected error occurred trying to connect! Exception: " + ex.Message + "\r\nPlease report this error to the adminstrator.");
+                MessageBox.Show("Unexpected error occurred trying to connect! Exception: " + ex.Message +
+                                "\r\nPlease report this error to the adminstrator.");
             }
         }
 
@@ -230,7 +327,7 @@ namespace Squad.Admin.Console.Forms
 
         private void btnSettings_Click(object sender, EventArgs e)
         {
-            frmSettings fSettings = new frmSettings();
+            var fSettings = new frmSettings();
             fSettings.ShowDialog(this);
             LoadContextMenuItems();
         }
@@ -267,47 +364,53 @@ namespace Squad.Admin.Console.Forms
 
                 if (currentMouseOverRow >= 0)
                 {
-                    ContextMenu m = new ContextMenu();
+                    var m = new ContextMenu();
 
-                    MenuItem ct = new MenuItem("ChangeTeam");
+                    var ct = new MenuItem("ChangeTeam");
                     ct.Tag = "AdminForceTeamChange " + playerSteamId;
                     ct.Click += menu_Click;
                     m.MenuItems.Add(ct);
 
                     // Warnings
-                    MenuItem wi = new MenuItem("Warn");
+                    var wi = new MenuItem("Warn");
 
                     foreach (XElement w in menuReasons.Root.Element("WarnReasons").Elements())
                     {
-                        MenuItem warn = new MenuItem(w.Value.Replace("PLAYERNAME", playerName).Replace("ADMINNAME", adminName));
+                        var warn = new MenuItem(w.Value.Replace("PLAYERNAME", playerName)
+                            .Replace("ADMINNAME", adminName));
                         warn.Tag = "AdminBroadcast " + warn.Text;
                         warn.Click += menu_Click;
                         wi.MenuItems.Add(warn);
                     }
+
                     m.MenuItems.Add(wi);
 
                     // Kicks
-                    MenuItem ki = new MenuItem("Kick");
+                    var ki = new MenuItem("Kick");
 
                     foreach (XElement k in menuReasons.Root.Element("KickReasons").Elements())
                     {
-                        MenuItem kick = new MenuItem(k.Value.Replace("PLAYERNAME", playerName).Replace("ADMINNAME", adminName));
+                        var kick = new MenuItem(k.Value.Replace("PLAYERNAME", playerName)
+                            .Replace("ADMINNAME", adminName));
                         kick.Tag = "AdminKick " + playerSteamId + " " + kick.Text;
                         kick.Click += menu_Click;
                         ki.MenuItems.Add(kick);
                     }
+
                     m.MenuItems.Add(ki);
 
                     // BansS
-                    MenuItem bi = new MenuItem("Ban");
+                    var bi = new MenuItem("Ban");
 
                     foreach (XElement b in menuReasons.Root.Element("BanReasons").Elements())
                     {
-                        MenuItem ban = new MenuItem(b.Value.Replace("PLAYERNAME", playerName).Replace("ADMINNAME", adminName));
+                        var ban = new MenuItem(
+                            b.Value.Replace("PLAYERNAME", playerName).Replace("ADMINNAME", adminName));
                         ban.Tag = "AdminBan " + playerSteamId + " " + ban.Text;
                         ban.Click += menu_Click;
                         bi.MenuItems.Add(ban);
                     }
+
                     m.MenuItems.Add(bi);
 
                     m.Show(grdPlayers, new Point(e.X, e.Y));
@@ -318,17 +421,16 @@ namespace Squad.Admin.Console.Forms
         private void GrdPlayers_RowPrePaint(object sender, DataGridViewRowPrePaintEventArgs e)
         {
             if (Convert.ToString(grdPlayers.Rows[e.RowIndex].Cells[4].Value).Trim() != string.Empty)
-            {
                 grdPlayers.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.Silver;
-            }
         }
 
-        void menu_Click(object sender, EventArgs e)
+        private void menu_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show(String.Format("Confirm the player action {0}", ((MenuItem) sender).Tag.ToString()),
-                "Confirm the player action", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
+            if (MessageBox.Show(string.Format("Confirm the player action {0}", ((MenuItem) sender).Tag),
+                    "Confirm the player action", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) ==
+                DialogResult.OK)
             {
-                var response = this.rconServerProxy.SendCommand(((MenuItem) sender).Tag.ToString());
+                string response = rconServerProxy.SendCommand(((MenuItem) sender).Tag.ToString());
                 AddCommandToHistoryList(((MenuItem) sender).Tag.ToString());
                 AddServerResponseText(txtResponse, response);
             }
@@ -340,10 +442,7 @@ namespace Squad.Admin.Console.Forms
             if (e.Button == MouseButtons.Left)
             {
                 int index = lstHistory.IndexFromPoint(e.Location);
-                if (index != ListBox.NoMatches)
-                {
-                    SetTextboxText(txtCommand, lstHistory.Items[index].ToString());
-                }
+                if (index != ListBox.NoMatches) SetTextboxText(txtCommand, lstHistory.Items[index].ToString());
             }
         }
 
@@ -357,6 +456,7 @@ namespace Squad.Admin.Console.Forms
             SetControlEnabledState(btnConnect, !enable);
             SetControlEnabledState(txtServerIP, !enable);
             SetControlEnabledState(txtServerPort, !enable);
+            SetControlEnabledState(MTQueryPort, !enable);
             SetControlEnabledState(txtRconPassword, !enable);
             SetControlEnabledState(txtDisplayName, !enable);
             SetControlEnabledState(chkShowPassword, !enable);
@@ -370,28 +470,23 @@ namespace Squad.Admin.Console.Forms
         /// </summary>
         private void LoadAutocompleteCommands()
         {
-            AutoCompleteStringCollection commandList = new AutoCompleteStringCollection();
+            var commandList = new AutoCompleteStringCollection();
 
             string commandsFile;
             if (ApplicationDeployment.IsNetworkDeployed)
-            {
                 commandsFile = ApplicationDeployment.CurrentDeployment.DataDirectory + @"\Assets\Commands.dat";
-            } 
             else
-            {
                 commandsFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Assets\Commands.dat");
-            }
 
             if (!File.Exists(commandsFile))
             {
-                MessageBox.Show(String.Format("Failed to load commands autocomplete file {0}", commandsFile),
+                MessageBox.Show(string.Format("Failed to load commands autocomplete file {0}", commandsFile),
                     "Missing resource", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            } 
-            else
+            } else
             {
                 string[] commands = File.ReadAllLines(commandsFile);
 
-                for (int i = 0; i < commands.Length; i++)
+                for (var i = 0; i < commands.Length; i++)
                 {
                     commandList.Add(commands[i].Trim());
                 }
@@ -403,28 +498,25 @@ namespace Squad.Admin.Console.Forms
         /// <summary>
         ///     Fill the Command textbox autocomplete list with all valid commands from the Commands.dat text file
         /// </summary>
-        private void LoadMapNames()
+        private void LoadMapNames(string filename)
         {
             var mapList = new AutoCompleteStringCollection();
 
             string commandsFile;
             if (ApplicationDeployment.IsNetworkDeployed)
-            {
-                commandsFile = ApplicationDeployment.CurrentDeployment.DataDirectory + @"\Assets\Maps.dat";
-            } 
+                commandsFile = ApplicationDeployment.CurrentDeployment.DataDirectory + @"\Assets\" + filename;
             else
-            {
-                commandsFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Assets\Maps.dat");
-            }
+                commandsFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Assets\" + filename);
 
             if (!File.Exists(commandsFile))
             {
-                MessageBox.Show(String.Format("Failed to load map list file {0}", commandsFile),
+                MessageBox.Show(string.Format("Failed to load map list file {0}", commandsFile),
                     "Missing resource", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            } 
-            else
+            } else
             {
                 string[] commands = File.ReadAllLines(commandsFile);
+
+                MapNamesCombo.Items.Clear();
 
                 for (var i = 0; i < commands.Length; i++)
                 {
@@ -447,21 +539,18 @@ namespace Squad.Admin.Console.Forms
         {
             string commandsFile;
             if (ApplicationDeployment.IsNetworkDeployed)
-            {
                 commandsFile = ApplicationDeployment.CurrentDeployment.DataDirectory + @"\Assets\MenuReasons.xml";
-            } else
-            {
+            else
                 commandsFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Assets\MenuReasons.xml");
-            }
 
             // Load the xml file with the menu reasons
             try
             {
                 menuReasons = XDocument.Load(commandsFile);
-            } 
-            catch (Exception ex)
+            } catch (Exception ex)
             {
-                MessageBox.Show("Error occurred trying to open the menu options!\r\nError: " + ex.Message, "Exception", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                MessageBox.Show("Error occurred trying to open the menu options!\r\nError: " + ex.Message, "Exception",
+                    MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
             }
         }
 
@@ -474,7 +563,7 @@ namespace Squad.Admin.Console.Forms
         /// </summary>
         private void GetServerInformation()
         {
-            ServerInfo info = this.rconServerProxy.GetServerData();
+            ServerInfo info = rconServerProxy.GetServerData(serverConnectionInfo.QueryPort);
 
             if (info != null)
             {
@@ -494,15 +583,15 @@ namespace Squad.Admin.Console.Forms
 
             try
             {
-                string playerList = this.rconServerProxy.GetPlayerList();
+                string playerList = rconServerProxy.GetPlayerList();
 
                 // Remove all rows from the grid
                 ClearGridRows(grdPlayers);
 
                 // Take the response and break it into a string array breaking each line off
-                string[] playerArray = playerList.Split(new string[] {"\r\n", "\n"}, StringSplitOptions.None);
+                string[] playerArray = playerList.Split(new[] {"\r\n", "\n"}, StringSplitOptions.None);
 
-                for (int i = 0; i < playerArray.Length; i++)
+                for (var i = 0; i < playerArray.Length; i++)
                 {
                     // Get the current line
                     currentLine = playerArray[i].Trim();
@@ -530,7 +619,6 @@ namespace Squad.Admin.Console.Forms
 
                         // Process connected player list
                         if (activePlayers)
-                        {
                             if (isPlayer)
                             {
                                 string[] playerInfo = currentLine.Split(':');
@@ -541,11 +629,9 @@ namespace Squad.Admin.Console.Forms
 
                                 AddPlayerToGrid(slot[0], playerName, steamId[0], "Connected", "");
                             }
-                        }
 
                         // Process disconnected player list
                         if (disconnectedPlayers)
-                        {
                             if (isPlayer)
                             {
                                 string[] playerInfo = currentLine.Split(':');
@@ -557,12 +643,9 @@ namespace Squad.Admin.Console.Forms
 
                                 AddPlayerToGrid(slot[0], playerName, steamId[0], "Disconnected", time[0]);
                             }
-                        }
                     }
                 }
-
-            } 
-            catch (Exception ex)
+            } catch (Exception ex)
             { }
         }
 
@@ -570,14 +653,14 @@ namespace Squad.Admin.Console.Forms
 
         #region Invoke Callbacks
 
-        private void AddPlayerToGrid(string serverSlot, string playerName, string steamId, string connectStatus, string disconnectTime)
+        private void AddPlayerToGrid(string serverSlot, string playerName, string steamId, string connectStatus,
+            string disconnectTime)
         {
             if (grdPlayers.InvokeRequired)
             {
                 AddGridRow i = AddPlayerToGrid;
                 Invoke(i, serverSlot, playerName, steamId, connectStatus, disconnectTime);
-            } 
-            else
+            } else
             {
                 grdPlayers.Rows.Add(serverSlot, playerName, steamId, connectStatus, disconnectTime);
             }
@@ -589,16 +672,16 @@ namespace Squad.Admin.Console.Forms
             {
                 AddListboxItem c = AddCommandToHistoryList;
                 Invoke(c, commandText);
-            } 
-            else
+            } else
             {
                 // prevent duplication of the same command from being added to the list
-                bool isDup = false;
-                for (int i = 0; i < lstHistory.Items.Count; i++)
+                var isDup = false;
+                for (var i = 0; i < lstHistory.Items.Count; i++)
                 {
                     isDup = lstHistory.Items[i].ToString() == commandText;
                     if (isDup) break;
                 }
+
                 if (!isDup) lstHistory.Items.Insert(0, commandText);
             }
         }
@@ -609,14 +692,10 @@ namespace Squad.Admin.Console.Forms
             {
                 AddTextToTextbox c = AddServerResponseText;
                 Invoke(c, control, response);
-            } 
-            else
+            } else
             {
                 // substitute \r\n for \n
-                if (!string.IsNullOrWhiteSpace(response))
-                {
-                    response = response.Replace("\n", Environment.NewLine);
-                }
+                if (!string.IsNullOrWhiteSpace(response)) response = response.Replace("\n", Environment.NewLine);
                 if (control.Text.Length > 0) control.Text += Environment.NewLine + Environment.NewLine;
                 control.Text += response;
             }
@@ -628,8 +707,7 @@ namespace Squad.Admin.Console.Forms
             {
                 AddTextToTextbox c = SetTextboxText;
                 Invoke(c, control, text);
-            } 
-            else
+            } else
             {
                 control.Text = text;
             }
@@ -641,8 +719,7 @@ namespace Squad.Admin.Console.Forms
             {
                 AddTextToTextbox c = ClearCommandText;
                 Invoke(c, control, response);
-            } 
-            else
+            } else
             {
                 control.Text = string.Empty;
             }
@@ -696,16 +773,17 @@ namespace Squad.Admin.Console.Forms
 
         #endregion
 
-        private void txtDisplayName_TextChanged(object sender, EventArgs e)
-        {
-            Settings.Default.AdminName = txtDisplayName.Text;
-            Settings.Default.Save();
+        private void label3_Click(object sender, EventArgs e) {
+
         }
 
-        private void txtRconPassword_TextChanged(object sender, EventArgs e) {
-            TextBox tb = (TextBox)sender;
-            this.serverConnectionInfo.Password = tb.Text.Trim();
-            btnConnect.Enabled = this.serverConnectionInfo.IsValid();
+        private void MTQueryPort_TextChanged(object sender, EventArgs e) {
+            try
+            {
+              Settings.Default.QueryPort = int.Parse(MTQueryPort.Text ?? "0");
+                Settings.Default.Save();
+            } catch (FormatException) { }
         }
+
     }
 }

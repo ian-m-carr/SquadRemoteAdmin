@@ -52,11 +52,13 @@
             this.btnSettings = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.txtServerIP = new System.Windows.Forms.TextBox();
+            this.MTQueryPort = new System.Windows.Forms.MaskedTextBox();
             this.txtServerPort = new System.Windows.Forms.MaskedTextBox();
             this.chkShowPassword = new System.Windows.Forms.CheckBox();
             this.btnDisconnect = new System.Windows.Forms.Button();
             this.btnConnect = new System.Windows.Forms.Button();
             this.txtDisplayName = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.lblDisplayName = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.txtRconPassword = new System.Windows.Forms.TextBox();
@@ -68,6 +70,8 @@
             this.lblPlayerCountLabel = new System.Windows.Forms.Label();
             this.lblPlayerCount = new System.Windows.Forms.Label();
             this.grpMapManagement = new System.Windows.Forms.GroupBox();
+            this.RBPostScriptum = new System.Windows.Forms.RadioButton();
+            this.RBSquad = new System.Windows.Forms.RadioButton();
             this.RestartMatchButton = new System.Windows.Forms.Button();
             this.EndMatchButton = new System.Windows.Forms.Button();
             this.SetNextMapButton = new System.Windows.Forms.Button();
@@ -100,9 +104,9 @@
             this.grpPlayerList.Controls.Add(this.lblFindPlayer);
             this.grpPlayerList.Controls.Add(this.btnRefresh);
             this.grpPlayerList.Enabled = false;
-            this.grpPlayerList.Location = new System.Drawing.Point(12, 114);
+            this.grpPlayerList.Location = new System.Drawing.Point(12, 133);
             this.grpPlayerList.Name = "grpPlayerList";
-            this.grpPlayerList.Size = new System.Drawing.Size(639, 727);
+            this.grpPlayerList.Size = new System.Drawing.Size(639, 711);
             this.grpPlayerList.TabIndex = 0;
             this.grpPlayerList.TabStop = false;
             this.grpPlayerList.Text = "Player List";
@@ -123,7 +127,7 @@
             this.grdPlayers.Location = new System.Drawing.Point(9, 46);
             this.grdPlayers.Name = "grdPlayers";
             this.grdPlayers.ReadOnly = true;
-            this.grdPlayers.Size = new System.Drawing.Size(624, 633);
+            this.grdPlayers.Size = new System.Drawing.Size(624, 617);
             this.grdPlayers.TabIndex = 11;
             // 
             // cSlot
@@ -181,7 +185,7 @@
             // btnRefresh
             // 
             this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnRefresh.Location = new System.Drawing.Point(482, 685);
+            this.btnRefresh.Location = new System.Drawing.Point(482, 669);
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(151, 36);
             this.btnRefresh.TabIndex = 6;
@@ -205,7 +209,7 @@
             this.grpConsole.Enabled = false;
             this.grpConsole.Location = new System.Drawing.Point(657, 195);
             this.grpConsole.Name = "grpConsole";
-            this.grpConsole.Size = new System.Drawing.Size(481, 646);
+            this.grpConsole.Size = new System.Drawing.Size(482, 649);
             this.grpConsole.TabIndex = 0;
             this.grpConsole.TabStop = false;
             this.grpConsole.Text = "Console Command";
@@ -213,7 +217,7 @@
             // btnClearConsole
             // 
             this.btnClearConsole.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClearConsole.Location = new System.Drawing.Point(366, 604);
+            this.btnClearConsole.Location = new System.Drawing.Point(367, 607);
             this.btnClearConsole.Name = "btnClearConsole";
             this.btnClearConsole.Size = new System.Drawing.Size(109, 36);
             this.btnClearConsole.TabIndex = 8;
@@ -237,7 +241,7 @@
             this.lstHistory.FormattingEnabled = true;
             this.lstHistory.Location = new System.Drawing.Point(6, 108);
             this.lstHistory.Name = "lstHistory";
-            this.lstHistory.Size = new System.Drawing.Size(469, 56);
+            this.lstHistory.Size = new System.Drawing.Size(470, 56);
             this.lstHistory.TabIndex = 5;
             // 
             // label1
@@ -252,7 +256,7 @@
             // btnClear
             // 
             this.btnClear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClear.Location = new System.Drawing.Point(366, 170);
+            this.btnClear.Location = new System.Drawing.Point(367, 170);
             this.btnClear.Name = "btnClear";
             this.btnClear.Size = new System.Drawing.Size(109, 36);
             this.btnClear.TabIndex = 3;
@@ -263,7 +267,7 @@
             // btnSend
             // 
             this.btnSend.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSend.Location = new System.Drawing.Point(366, 46);
+            this.btnSend.Location = new System.Drawing.Point(367, 46);
             this.btnSend.Name = "btnSend";
             this.btnSend.Size = new System.Drawing.Size(109, 36);
             this.btnSend.TabIndex = 2;
@@ -283,7 +287,7 @@
             this.txtResponse.Name = "txtResponse";
             this.txtResponse.ReadOnly = true;
             this.txtResponse.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtResponse.Size = new System.Drawing.Size(469, 377);
+            this.txtResponse.Size = new System.Drawing.Size(470, 380);
             this.txtResponse.TabIndex = 7;
             // 
             // txtCommand
@@ -294,14 +298,14 @@
             this.txtCommand.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this.txtCommand.Location = new System.Drawing.Point(6, 20);
             this.txtCommand.Name = "txtCommand";
-            this.txtCommand.Size = new System.Drawing.Size(469, 20);
+            this.txtCommand.Size = new System.Drawing.Size(470, 20);
             this.txtCommand.TabIndex = 1;
             // 
             // btnSettings
             // 
             this.btnSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSettings.Image = ((System.Drawing.Image)(resources.GetObject("btnSettings.Image")));
-            this.btnSettings.Location = new System.Drawing.Point(1098, 12);
+            this.btnSettings.Location = new System.Drawing.Point(1099, 12);
             this.btnSettings.Name = "btnSettings";
             this.btnSettings.Size = new System.Drawing.Size(40, 40);
             this.btnSettings.TabIndex = 11;
@@ -312,11 +316,13 @@
             // 
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel1.Controls.Add(this.txtServerIP);
+            this.panel1.Controls.Add(this.MTQueryPort);
             this.panel1.Controls.Add(this.txtServerPort);
             this.panel1.Controls.Add(this.chkShowPassword);
             this.panel1.Controls.Add(this.btnDisconnect);
             this.panel1.Controls.Add(this.btnConnect);
             this.panel1.Controls.Add(this.txtDisplayName);
+            this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.lblDisplayName);
             this.panel1.Controls.Add(this.label6);
             this.panel1.Controls.Add(this.pictureBox1);
@@ -325,7 +331,7 @@
             this.panel1.Controls.Add(this.label5);
             this.panel1.Location = new System.Drawing.Point(12, 12);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(639, 96);
+            this.panel1.Size = new System.Drawing.Size(639, 115);
             this.panel1.TabIndex = 0;
             // 
             // txtServerIP
@@ -335,6 +341,15 @@
             this.txtServerIP.Size = new System.Drawing.Size(102, 20);
             this.txtServerIP.TabIndex = 2;
             this.txtServerIP.TextChanged += new System.EventHandler(this.txtServerIP_TextChanged);
+            // 
+            // MTQueryPort
+            // 
+            this.MTQueryPort.Location = new System.Drawing.Point(278, 85);
+            this.MTQueryPort.Mask = "#####";
+            this.MTQueryPort.Name = "MTQueryPort";
+            this.MTQueryPort.Size = new System.Drawing.Size(49, 20);
+            this.MTQueryPort.TabIndex = 10;
+            this.MTQueryPort.TextChanged += new System.EventHandler(this.MTQueryPort_TextChanged);
             // 
             // txtServerPort
             // 
@@ -385,6 +400,16 @@
             this.txtDisplayName.Size = new System.Drawing.Size(162, 20);
             this.txtDisplayName.TabIndex = 8;
             this.txtDisplayName.TextChanged += new System.EventHandler(this.txtDisplayName_TextChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(189, 85);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(57, 13);
+            this.label3.TabIndex = 7;
+            this.label3.Text = "Query Port";
+            this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
             // lblDisplayName
             // 
@@ -478,22 +503,48 @@
             // 
             this.grpMapManagement.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpMapManagement.Controls.Add(this.RBPostScriptum);
+            this.grpMapManagement.Controls.Add(this.RBSquad);
             this.grpMapManagement.Controls.Add(this.RestartMatchButton);
             this.grpMapManagement.Controls.Add(this.EndMatchButton);
             this.grpMapManagement.Controls.Add(this.SetNextMapButton);
             this.grpMapManagement.Controls.Add(this.ChangeMapButton);
             this.grpMapManagement.Controls.Add(this.MapNamesCombo);
             this.grpMapManagement.Enabled = false;
-            this.grpMapManagement.Location = new System.Drawing.Point(657, 114);
+            this.grpMapManagement.Location = new System.Drawing.Point(657, 89);
             this.grpMapManagement.Name = "grpMapManagement";
-            this.grpMapManagement.Size = new System.Drawing.Size(481, 75);
+            this.grpMapManagement.Size = new System.Drawing.Size(482, 100);
             this.grpMapManagement.TabIndex = 18;
             this.grpMapManagement.TabStop = false;
             this.grpMapManagement.Text = "Map Management";
             // 
+            // RBPostScriptum
+            // 
+            this.RBPostScriptum.AutoSize = true;
+            this.RBPostScriptum.Location = new System.Drawing.Point(76, 21);
+            this.RBPostScriptum.Name = "RBPostScriptum";
+            this.RBPostScriptum.Size = new System.Drawing.Size(87, 17);
+            this.RBPostScriptum.TabIndex = 6;
+            this.RBPostScriptum.Text = "PostScriptum";
+            this.RBPostScriptum.UseVisualStyleBackColor = true;
+            this.RBPostScriptum.CheckedChanged += new System.EventHandler(this.RBPostScriptum_CheckedChanged);
+            // 
+            // RBSquad
+            // 
+            this.RBSquad.AutoSize = true;
+            this.RBSquad.Checked = true;
+            this.RBSquad.Location = new System.Drawing.Point(14, 21);
+            this.RBSquad.Name = "RBSquad";
+            this.RBSquad.Size = new System.Drawing.Size(56, 17);
+            this.RBSquad.TabIndex = 5;
+            this.RBSquad.TabStop = true;
+            this.RBSquad.Text = "Squad";
+            this.RBSquad.UseVisualStyleBackColor = true;
+            this.RBSquad.CheckedChanged += new System.EventHandler(this.RBSquad_CheckedChanged);
+            // 
             // RestartMatchButton
             // 
-            this.RestartMatchButton.Location = new System.Drawing.Point(88, 45);
+            this.RestartMatchButton.Location = new System.Drawing.Point(95, 71);
             this.RestartMatchButton.Name = "RestartMatchButton";
             this.RestartMatchButton.Size = new System.Drawing.Size(89, 23);
             this.RestartMatchButton.TabIndex = 4;
@@ -503,7 +554,7 @@
             // 
             // EndMatchButton
             // 
-            this.EndMatchButton.Location = new System.Drawing.Point(7, 45);
+            this.EndMatchButton.Location = new System.Drawing.Point(14, 71);
             this.EndMatchButton.Name = "EndMatchButton";
             this.EndMatchButton.Size = new System.Drawing.Size(75, 23);
             this.EndMatchButton.TabIndex = 3;
@@ -513,7 +564,7 @@
             // 
             // SetNextMapButton
             // 
-            this.SetNextMapButton.Location = new System.Drawing.Point(329, 45);
+            this.SetNextMapButton.Location = new System.Drawing.Point(336, 71);
             this.SetNextMapButton.Name = "SetNextMapButton";
             this.SetNextMapButton.Size = new System.Drawing.Size(137, 23);
             this.SetNextMapButton.TabIndex = 2;
@@ -523,7 +574,7 @@
             // 
             // ChangeMapButton
             // 
-            this.ChangeMapButton.Location = new System.Drawing.Point(183, 45);
+            this.ChangeMapButton.Location = new System.Drawing.Point(190, 71);
             this.ChangeMapButton.Name = "ChangeMapButton";
             this.ChangeMapButton.Size = new System.Drawing.Size(140, 23);
             this.ChangeMapButton.TabIndex = 1;
@@ -539,16 +590,16 @@
             this.MapNamesCombo.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.MapNamesCombo.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this.MapNamesCombo.FormattingEnabled = true;
-            this.MapNamesCombo.Location = new System.Drawing.Point(7, 18);
+            this.MapNamesCombo.Location = new System.Drawing.Point(14, 44);
             this.MapNamesCombo.Name = "MapNamesCombo";
-            this.MapNamesCombo.Size = new System.Drawing.Size(459, 21);
+            this.MapNamesCombo.Size = new System.Drawing.Size(460, 21);
             this.MapNamesCombo.TabIndex = 0;
             // 
             // frmMainConsole
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(1150, 853);
+            this.ClientSize = new System.Drawing.Size(1151, 856);
             this.Controls.Add(this.grpMapManagement);
             this.Controls.Add(this.lblPlayerCount);
             this.Controls.Add(this.lblPlayerCountLabel);
@@ -563,6 +614,8 @@
             this.Name = "frmMainConsole";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Squad RCON - Remote Server Console";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMainConsole_FormClosing);
+            this.Load += new System.EventHandler(this.frmMainConsole_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.grpPlayerList.ResumeLayout(false);
             this.grpPlayerList.PerformLayout();
@@ -572,6 +625,7 @@
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.grpMapManagement.ResumeLayout(false);
+            this.grpMapManagement.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -623,5 +677,9 @@
         private System.Windows.Forms.ComboBox MapNamesCombo;
         private System.Windows.Forms.Button EndMatchButton;
         private System.Windows.Forms.Button RestartMatchButton;
+        private System.Windows.Forms.RadioButton RBPostScriptum;
+        private System.Windows.Forms.RadioButton RBSquad;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.MaskedTextBox MTQueryPort;
     }
 }
